@@ -397,6 +397,7 @@
     const w = p.text.trim().split(/\s+/);
     return w.slice(0, 9).join(' ') + (w.length > 9 ? '…' : '');
   }
+  const fullPara = (t, L) => { const p = (t.paragraphs || []).find(x => x.label === L); return p ? `${L}. ${p.text.trim()}` : String(L); };
   function shortCorrect(t, q) {
     const k = KIND[t.part];
     if (k === 'mc') return q.options[q.answer];
@@ -408,7 +409,7 @@
     if (val === undefined || val === null || String(val).trim() === '') return '(no answer)';
     const k = KIND[t.part];
     if (k === 'mc') return t.part === '5' ? `${letter(val)}. ${q.options[val]}` : q.options[val];
-    if (k === 'letter' && t.part === '6') return `“${snippet(t, val)}”`;
+    if (k === 'letter' && t.part === '6') return fullPara(t, val);
     return String(val);
   }
   function fmtCorrect(t, q) {
@@ -418,7 +419,7 @@
       if (t.part === '4') return [q.before, q.parts ? schemesOf(q)[0][0][0] + ' | ' + schemesOf(q)[0][1][0] : q.answer[0], q.after].filter(Boolean).join(' ').replace(/\s+([,.;:])/g, '$1');
       return q.answer.join('  /  ');
     }
-    if (t.part === '6') return `“${snippet(t, q.answer)}”`;
+    if (t.part === '6') return fullPara(t, q.answer);
     return q.answer;
   }
 
@@ -934,7 +935,32 @@
     if (scale >= 213) return 'Grade B';
     if (scale >= 200) return 'Grade C';
     if (scale >= 180) return 'Level C1';
-    return 'Below C1';
+    return scale >= 162 ? 'Below C1' : 'Not reported';
+  }
+
+  // The grade bands drawn to scale, with a marker at the estimated score
+  function gradeChart(sc) {
+    const NS = 'http://www.w3.org/2000/svg', LO = 162, HI = 230, X0 = 20, W = 640;
+    const x = v => X0 + (Math.min(HI, Math.max(LO, v)) - LO) / (HI - LO) * W;
+    const el = (tag, attrs, text) => {
+      const e = document.createElementNS(NS, tag);
+      Object.keys(attrs || {}).forEach(k => e.setAttribute(k, attrs[k]));
+      if (text !== undefined) e.textContent = text;
+      return e;
+    };
+    const bands = [[162, 180, 'Below C1', 'band-low'], [180, 200, 'Level C1', 'band-c1'], [200, 213, 'Grade C', 'band-c'], [213, 220, 'Grade B', 'band-b'], [220, 230, 'Grade A', 'band-a']];
+    const svg = el('svg', { viewBox: '0 0 680 112', class: 'gradechart', role: 'img',
+      'aria-label': `Estimated score ${sc >= 180 ? sc : 'below 180'} on a scale with Grade A 220 to 230, Grade B 213 to 219, Grade C 200 to 212, Level C1 180 to 199` });
+    bands.forEach(([a, b, label, cls], i) => {
+      const x1 = x(a) + (i ? 1 : 0), x2 = x(b === 230 ? 230 : b) - (i < bands.length - 1 ? 1 : 0);
+      svg.append(el('rect', { x: x1, y: 38, width: x2 - x1, height: 30, rx: 4, class: 'band ' + cls }));
+      svg.append(el('text', { x: (x1 + x2) / 2, y: 57, class: 'band-label', 'text-anchor': 'middle' }, label));
+    });
+    [162, 180, 200, 213, 220, 230].forEach(v => svg.append(el('text', { x: x(v), y: 90, class: 'tick', 'text-anchor': 'middle' }, String(v))));
+    const mx = x(sc);
+    svg.append(el('path', { d: `M${mx - 7} 22 L${mx + 7} 22 L${mx} 36 Z`, class: 'marker' }));
+    svg.append(el('text', { x: Math.min(640, Math.max(40, mx)), y: 15, class: 'marker-label', 'text-anchor': 'middle' }, sc >= 180 ? String(sc) : '< 180'));
+    return svg;
   }
 
   function viewExamStart() {
@@ -994,12 +1020,13 @@
         if (words) entry = { ts: Date.now(), id: t.id, part: t.part, title: t.title, words, ms: 0, text, task: writingTask(t, st.choice || 0), exam: true };
       } else {
         const wt = WEIGHT[t.part], ans = st.answers || {};
-        let score = 0;
+        let score = 0, right = 0;
         t.questions.forEach((q, k) => {
-          const v = ans[k + 1], ph = t.part === '4' ? partHits(q, v) : null;
-          score += (isCorrect(t, q, v) || (ph && ph.n === 2)) ? wt : (ph ? ph.n : 0);
+          const v = ans[k + 1], ph = t.part === '4' ? partHits(q, v) : null, full = isCorrect(t, q, v) || !!(ph && ph.n === 2);
+          score += full ? wt : (ph ? ph.n : 0);
+          if (full) right++;
         });
-        entry = { ts: Date.now(), id: t.id, part: t.part, title: t.title, score, total: t.questions.length * wt, ms: 0, exam: true };
+        entry = { ts: Date.now(), id: t.id, part: t.part, title: t.title, score, total: t.questions.length * wt, ms: 0, exam: true, right };
       }
       if (entry) DB.history.push(entry);
       X.entries[i] = entry;
@@ -1025,7 +1052,7 @@
       return h('tr', null,
         h('td', { text: 'Part ' + t.part.replace('W', '') }),
         h('td', null, h('b', { text: t.title }), h('br'), h('small', { text: PARTS[t.part].name })),
-        h('td', { text: isW ? (e ? `${e.words} words` : 'Not attempted') : `${e.score} / ${e.total}` }),
+        h('td', { text: isW ? (e ? `${e.words} words` : 'Not attempted') : `${e.right} / ${t.questions.length}` }),
         h('td', null, h('button', { type: 'button', class: 'btn small', onclick: () => examReview(i) }, 'Review')));
     });
     let head;
@@ -1033,17 +1060,17 @@
       head = h('p', { class: 'lead', text: 'Your writing has been saved to History. Use Review, then “Copy for feedback”, to have it assessed.' });
     } else {
       const sc = scaleScore(got, tot);
-      head = h('div', { class: 'examscore' },
-        h('div', { class: 'big', text: String(sc) }),
+      head = h('div', null, h('div', { class: 'examscore' },
+        h('div', { class: 'big', text: sc >= 180 ? String(sc) : '< 180' }),
         h('div', null, h('div', { class: 'grade', text: gradeOf(sc) }),
-          h('div', { class: 'sub', text: `${got} / ${tot} marks · estimated on the 180–230 scale` })));
+          h('div', { class: 'sub', text: `${got} / ${tot} marks · estimated on the 180–230 scale` }))), gradeChart(sc));
     }
     app.replaceChildren(h('div', { class: 'page' },
       h('h1', { text: EXAMS[X.key].name + (X.timeUp ? ' – time is up' : ' – finished') }),
       h('p', { class: 'lead', text: `Time used: ${fmtTime(X.spent)} of 1:30:00.` }),
       head,
-      h('table', { class: 'stats' }, h('thead', null, h('tr', null, ['Part', 'Test', isW ? 'Length' : 'Marks', ''].map(c => h('th', { text: c })))), h('tbody', null, rows)),
-      isW ? null : h('p', { class: 'sub', text: 'The scale score is an estimate: Cambridge converts marks to the scale differently for every paper, so a real result can differ. Grades: A 220–230, B 213–219, C 200–212, Level C1 180–199.' }),
+      h('table', { class: 'stats' }, h('thead', null, h('tr', null, ['Part', 'Test', isW ? 'Length' : 'Correct', ''].map(c => h('th', { text: c })))), h('tbody', null, rows)),
+      isW ? null : h('p', { class: 'sub', text: 'The scale score is an estimate: Cambridge converts marks to the scale differently for every paper, so a real result can differ.' }),
       h('div', { class: 'toolbar' },
         h('button', { type: 'button', class: 'btn primary', onclick: () => examStart(X.key) }, 'New paper'),
         h('button', { type: 'button', class: 'btn', onclick: () => go('#/') }, 'Back to list'))));

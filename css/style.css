@@ -348,3 +348,16 @@ body.notes-open #app { margin-right: 330px; }
   .split.resizable, .wgrid.resizable { grid-template-columns: 1fr; }
   .divider { display: none; }
 }
+
+/* ---------- grade chart ---------- */
+.gradechart { width: 100%; max-width: 680px; height: auto; display: block; margin: 0 0 18px; }
+.gradechart .band { fill: var(--line); }
+.gradechart .band-c1 { fill: #cfe3e0; }
+.gradechart .band-c { fill: #8fc4bd; }
+.gradechart .band-b { fill: #4fa297; }
+.gradechart .band-a { fill: var(--teal-dark); }
+.gradechart .band-label { font-size: 12px; font-weight: 700; fill: var(--navy); }
+.gradechart .band-b + .band-label, .gradechart .band-a + .band-label { fill: #fff; }
+.gradechart .tick { font-size: 12px; fill: var(--muted); }
+.gradechart .marker { fill: var(--navy); }
+.gradechart .marker-label { font-size: 14px; font-weight: 700; fill: var(--navy); }
