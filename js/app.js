@@ -116,6 +116,7 @@
   const KEY = 'c2practice.v1';
   let DB = { progress: {}, history: [] };
   try { DB = Object.assign(DB, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (e) { /* ignore */ }
+  DB.progress = {};   // exam conditions: a test cannot be left and resumed, so nothing in progress is kept
   function saveDB() { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) { /* ignore */ } }
 
   /* ------------------------------------------------------------------ *
@@ -204,7 +205,7 @@
     viewHome();
   }
   window.addEventListener('hashchange', route);
-  window.addEventListener('beforeunload', () => { if (S && !S.checked) { if (S.running) pauseTimer(); else saveProgress(); } });
+  window.addEventListener('beforeunload', ev => { if (S && !S.checked) { ev.preventDefault(); ev.returnValue = ''; } });
 
   const go = hash => { location.hash = hash; };
 
@@ -216,7 +217,6 @@
 
   function statusOf(t) {
     const att = DB.history.filter(x => x.id === t.id);
-    if (DB.progress[t.id]) return { cls: 'prog', text: 'In progress' };
     if (!att.length) return { cls: 'new', text: 'Not attempted' };
     if (t.part === 'W1' || t.part === 'W2') return { cls: 'done', text: `Written ${att.length}×` };
     const best = Math.max(...att.map(a => a.score / a.total));
@@ -304,7 +304,7 @@
     } });
     const importBtn = h('button', { type: 'button', class: 'btn', onclick: () => fileIn.click() }, 'Import backup');
     const clearBtn = h('button', { type: 'button', class: 'btn danger', onclick: () => {
-      if (confirm('Delete all history and unfinished tests?')) { DB = { progress: {}, history: [] }; saveDB(); route(); }
+      if (confirm('Delete all history?')) { DB = { progress: {}, history: [] }; saveDB(); route(); }
     } }, 'Clear everything');
 
     const list = hist.map(x => {
@@ -380,19 +380,11 @@
     return q.answer;
   }
 
-  function saveProgress() {
-    if (!S || S.checked) return;
-    const hasAny = (S.notes && S.notes.length) || (S.writing ? (S.editor && S.editor.value.trim()) : Object.keys(S.answers).length || Object.keys(S.flags).length);
-    if (!hasAny && S.elapsed === 0 && !S.running) { delete DB.progress[S.t.id]; saveDB(); return; }
-    if (S.writing) DB.progress[S.t.id] = { text: S.editor.value, choice: S.choice, notes: S.notes, ms: curElapsed() };
-    else DB.progress[S.t.id] = { answers: S.answers, flags: S.flags, notes: S.notes, ms: curElapsed() };
-    saveDB();
-  }
+  // under exam conditions a test is not saved half-way: leaving it discards the attempt
+  function saveProgress() {}
 
   function openTest(t) {
     S = { t, answers: {}, flags: {}, cur: 1, checked: false, elapsed: 0, running: false, lastTs: 0, paint: {}, results: {}, notes: [], writing: t.part[0] === 'W' };
-    const prog = DB.progress[t.id];
-    if (prog) { S.notes = prog.notes || []; S.elapsed = prog.ms || 0; if (!S.writing) { S.answers = prog.answers || {}; S.flags = prog.flags || {}; } }
     const app = $('#app');
     app.className = 'testview';
     $('#hdr-tools').replaceChildren(stopwatchEl(), h('button', { type: 'button', class: 'btn', title: 'Select text in the passage to highlight it or add a note', onclick: () => ($('.notes-panel') ? closeNotes() : openNotes()) }, '\u270e Notes'));
@@ -794,11 +786,10 @@
    * ------------------------------------------------------------------ */
   function buildWriting(app) {
     const t = S.t, P = PARTS[t.part];
-    const prog = DB.progress[t.id];
-    S.choice = prog && typeof prog.choice === 'number' ? prog.choice : 0;
+    S.choice = 0;
 
     const editor = h('textarea', { class: 'editor', placeholder: 'Start writing here…', spellcheck: 'true' });
-    editor.value = prog ? prog.text || '' : '';
+    editor.value = '';
     S.editor = editor;
     const counter = h('span', { class: 'wcount' });
     const [lo, hi] = t.range;
