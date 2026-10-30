@@ -49,3 +49,5 @@ Your results are stored in the browser (localStorage), so use **History → Expo
 ## Built with
 
 Plain HTML, CSS and JavaScript, with no build step and no dependencies.
+
+Built by a C2 Proficiency student, for C2 Proficiency students.
