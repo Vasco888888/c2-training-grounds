@@ -57,17 +57,17 @@
   ]
 },
 {
-  id: 'p3-05', part: '3', title: 'The beaver returns',
-  text: `For centuries the beaver was regarded as little more than a source of fur, and its {1} from most of Europe passed almost without comment. Its return, however, has been anything but {2}. Landowners fear flooded fields, and some have taken {3} measures, breaking up dams under cover of darkness. Yet ecologists point to the {4} benefits that the animals bring. Their dams slow the flow of water, reducing the {5} of flooding downstream, and the pools they create provide a {6} for fish, amphibians and insects alike. Trials in England have shown that wetlands {7} by beavers can store vast quantities of water through a dry summer. Not everyone is persuaded, and the debate shows few signs of {8}, but the evidence is becoming hard to dismiss.`,
+  id: 'p3-05', part: '3', title: 'Running on empty',
+  text: `Ultramarathons, once the preserve of a few eccentrics, now attract thousands of {1}, many of them with no athletic background. Their {2} is easy to understand: the sheer {3} of crossing a mountain range on foot offers a satisfaction that shorter races cannot match. Yet the sport is not without its {4}. Runners can be on their feet for more than a day, and the strain on the body is almost {5}. Medical teams at the finish line report a steady stream of cases of severe {6}, and doctors warn that a {7} to ignore pain is not a virtue. Organisers insist that safety is their priority, though they accept that no regulation can ever fully {8} the dangers of the wilderness.`,
   questions: [
-    { stem: 'APPEAR', answer: ['disappearance'], explain: 'A noun after "its", with the prefix dis-: the beaver\'s disappearance from most of Europe.' },
-    { stem: 'CONTROVERSY', answer: ['uncontroversial', 'noncontroversial', 'non-controversial'], explain: '"Anything but" reverses the meaning, and the next sentence shows opposition, so the negative form is needed: its return has been anything but uncontroversial.' },
-    { stem: 'LAW', answer: ['unlawful'], explain: 'An adjective before "measures", and negative: breaking up protected dams under cover of darkness is unlawful.' },
-    { stem: 'ECOLOGY', answer: ['ecological'], explain: 'An adjective before "benefits": the ecological benefits of the animals.' },
-    { stem: 'LIKELY', answer: ['likelihood', 'likeliness'], explain: 'A noun after "the" and before "of flooding": reducing the likelihood of flooding.' },
-    { stem: 'HABIT', answer: ['habitat'], explain: 'A noun after "a" with a different ending: the pools provide a habitat for fish, amphibians and insects.' },
-    { stem: 'ENGINEER', answer: ['engineered', 're-engineered', 'reengineered'], explain: 'A past participle after "wetlands", with "by beavers" showing the passive: wetlands engineered by beavers.' },
-    { stem: 'ABATE', answer: ['abating', 'abatement'], explain: '"Signs of abating" (or "abatement") is the collocation: the debate shows few signs of subsiding.' }
+    { stem: 'PARTICIPATE', answer: ['participants'], explain: 'A plural noun for people after "thousands of": the people who take part are participants.' },
+    { stem: 'POPULAR', answer: ['popularity'], explain: 'A noun after "Their": the sport\'s popularity is easy to understand.' },
+    { stem: 'ACHIEVE', answer: ['achievement'], explain: 'An uncountable noun after "the sheer" and before "of crossing": the achievement of crossing a mountain range.' },
+    { stem: 'CRITIC', answer: ['critics', 'criticisms', 'criticism'], explain: 'A plural noun after "its": "not without its critics" means the sport has people who oppose it.' },
+    { stem: 'IMAGINE', answer: ['unimaginable'], explain: 'An adjective after "almost", and negative: the strain is almost beyond what can be imagined.' },
+    { stem: 'HYDRATE', answer: ['dehydration'], explain: 'A noun after "severe", with the prefix de- and a different ending: cases of severe dehydration.' },
+    { stem: 'WILLING', answer: ['willingness'], explain: 'A noun after "a": a willingness to ignore pain. The negative form would reverse the sense, since doctors say ignoring pain is not a virtue.' },
+    { stem: 'MINIMUM', answer: ['minimise', 'minimize'], explain: 'A verb after "can ever fully", formed with -ise: no regulation can fully minimise the dangers.' }
   ]
 },
 {

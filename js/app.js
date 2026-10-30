@@ -150,11 +150,22 @@
    * Stopwatch (manual start / pause / reset)
    * ------------------------------------------------------------------ */
   let S = null;        // state of the currently open test
+  let X = null;        // state of the exam in progress (several tests under one countdown), if any
   let tick = null;
+  const EXAM_MS = 90 * 60 * 1000;
 
   function curElapsed() { return S.elapsed + (S.running ? Date.now() - S.lastTs : 0); }
   function updateTimeUI() {
     if (!S || !S.swTime) return;
+    if (X) {
+      if (X.done) { S.swTime.textContent = 'Review'; return; }
+      const left = Math.max(0, X.deadline - Date.now());
+      S.swTime.textContent = fmtTime(Math.ceil(left / 1000) * 1000);
+      S.swTime.classList.toggle('low', left < 5 * 60 * 1000);
+      S.swTime.classList.add('running');
+      if (left <= 0) examFinish(true);
+      return;
+    }
     S.swTime.textContent = fmtTime(curElapsed());
     S.swTime.classList.toggle('running', S.running);
   }
@@ -196,6 +207,8 @@
     const app = $('#app');
     app.className = 'page'; app.scrollTop = 0;
     document.querySelectorAll('[data-nav]').forEach(a => a.classList.remove('active'));
+    X = null;
+    if (parts[0] === 'exam') { $('[data-nav="exam"]').classList.add('active'); viewExamStart(); return; }
     if (parts[0] === 'test' && parts[1]) {
       const t = TESTS.find(x => x.id === decodeURIComponent(parts[1]));
       if (t) { openTest(t); return; }
@@ -205,7 +218,12 @@
     viewHome();
   }
   window.addEventListener('hashchange', route);
-  window.addEventListener('beforeunload', ev => { if (S && !S.checked) { ev.preventDefault(); ev.returnValue = ''; } });
+  window.addEventListener('beforeunload', ev => { if ((S && !S.checked) || (X && !X.done)) { ev.preventDefault(); ev.returnValue = ''; } });
+  // leaving an exam by any link abandons it, so ask first
+  document.addEventListener('click', ev => {
+    const a = ev.target.closest && ev.target.closest('header a');
+    if (a && X && !X.done && !confirm('Leave the exam? Your answers will be lost.')) ev.preventDefault();
+  }, true);
 
   const go = hash => { location.hash = hash; };
 
@@ -268,6 +286,7 @@
   /* ------------------------------------------------------------------ *
    * History
    * ------------------------------------------------------------------ */
+  const avgTime = items => { const t = items.filter(x => x.ms > 0); return t.length ? fmtTime(t.reduce((a, x) => a + x.ms, 0) / t.length) : '–'; };
   function viewHistory() {
     const app = $('#app');
     const hist = DB.history.slice().sort((a, b) => b.ts - a.ts);
@@ -278,14 +297,14 @@
       if (p[0] === 'W') {
         const avg = Math.round(items.reduce((s, x) => s + x.words, 0) / items.length);
         return h('tr', null, h('td', { text: PARTS[p].name }), h('td', { text: items.length }), h('td', { text: `avg ${avg} words` }), h('td', { text: '–' }),
-          h('td', { text: fmtTime(items.reduce((s, x) => s + x.ms, 0) / items.length) }));
+          h('td', { text: avgTime(items) }));
       }
       const total = items[0].total;
       const avg = Math.round(items.reduce((a, x) => a + x.score, 0) / items.length * 10) / 10;
       return h('tr', null, h('td', { text: 'Part ' + p + ' – ' + PARTS[p].name }), h('td', { text: items.length }),
         h('td', { text: `${avg} / ${total}` }),
         h('td', { text: `${Math.max(...items.map(x => x.score))} / ${total}` }),
-        h('td', { text: fmtTime(items.reduce((a, x) => a + x.ms, 0) / items.length) }));
+        h('td', { text: avgTime(items) }));
     }).filter(Boolean);
 
     const exportBtn = h('button', { type: 'button', class: 'btn', onclick: () => {
@@ -313,7 +332,7 @@
         h('div', { class: 'when', text: fmtDate(x.ts) }),
         h('div', { class: 'what' }, h('b', { text: x.title }), h('small', { text: PARTS[x.part].name })),
         h('div', { class: 'res', text: isW ? `${x.words} words` : `${x.score} / ${x.total}` }),
-        h('div', { class: 'when', text: fmtTime(x.ms) }),
+        h('div', { class: 'when', text: x.ms ? fmtTime(x.ms) : '–' }),
         isW ? h('button', { type: 'button', class: 'btn small', onclick: ev => {
           const open = row.querySelector('.htext');
           if (open) { open.remove(); ev.target.textContent = 'View text'; }
@@ -334,6 +353,29 @@
         h('tbody', null, rows)) : null,
       list.length ? list : h('p', { class: 'empty', text: 'Nothing yet – go and do a test!' })));
     app.className = '';
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Resizable split: a draggable divider between the text and the questions
+   * ------------------------------------------------------------------ */
+  let splitRatio = 0.5;   // share of the width given to the left pane, kept while the site is open
+  function resizable(box) {
+    const apply = () => { box.style.setProperty('--lw', splitRatio + 'fr'); box.style.setProperty('--rw', (1 - splitRatio) + 'fr'); };
+    const set = v => { splitRatio = Math.min(0.75, Math.max(0.25, v)); apply(); };
+    const bar = h('div', { class: 'divider', role: 'separator', 'aria-orientation': 'vertical', 'aria-label': 'Resize the panels', title: 'Drag to resize', tabindex: '0' }, h('span'));
+    bar.addEventListener('pointerdown', e => {
+      e.preventDefault(); try { bar.setPointerCapture(e.pointerId); } catch (err) { /* no active pointer */ } bar.classList.add('drag');
+      const move = ev => { const r = box.getBoundingClientRect(); set((ev.clientX - r.left) / r.width); };
+      const up = () => { bar.classList.remove('drag'); bar.removeEventListener('pointermove', move); bar.removeEventListener('pointerup', up); bar.removeEventListener('pointercancel', up); };
+      bar.addEventListener('pointermove', move); bar.addEventListener('pointerup', up); bar.addEventListener('pointercancel', up);
+    });
+    bar.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); set(splitRatio + (e.key === 'ArrowLeft' ? -0.03 : 0.03)); }
+    });
+    box.classList.add('resizable');
+    box.insertBefore(bar, box.children[1]);
+    apply();
+    return box;
   }
 
   /* ------------------------------------------------------------------ *
@@ -385,6 +427,8 @@
 
   function openTest(t) {
     S = { t, answers: {}, flags: {}, cur: 1, checked: false, elapsed: 0, running: false, lastTs: 0, paint: {}, results: {}, notes: [], writing: t.part[0] === 'W' };
+    const saved = X && X.state[X.idx];       // returning to a part of the exam: put back what was entered
+    if (saved) { S.restore = saved; if (!S.writing) { S.answers = Object.assign({}, saved.answers); S.flags = Object.assign({}, saved.flags); } }
     const app = $('#app');
     app.className = 'testview';
     $('#hdr-tools').replaceChildren(stopwatchEl(), h('button', { type: 'button', class: 'btn', title: 'Select text in the passage to highlight it or add a note', onclick: () => ($('.notes-panel') ? closeNotes() : openNotes()) }, '\u270e Notes'));
@@ -602,14 +646,14 @@
         const m = Object.keys(S.answers).find(k => S.answers[k] === L);
         if (m) setAnswer(+m, undefined);
       });
-      content = h('div', { class: 'split' }, h('div', { class: 'pane plain' }, h('div', { class: 'ptitle', text: t.heading || t.title }), subtitle, cloze), pool);
+      content = resizable(h('div', { class: 'split' }, h('div', { class: 'pane plain' }, h('div', { class: 'ptitle', text: t.heading || t.title }), subtitle, cloze), pool));
     } else if (t.part === '7') {
       const left = h('div', { class: 'pane plain' }, h('div', { class: 'ptitle', text: t.heading || t.title }), subtitle,
         t.sections.map(x => h('div', { class: 'sec' }, h('div', { class: 'sechead' }, h('b', { text: x.label }), h('b', { text: x.heading || '' })),
           paras(x.text).map(p => h('p', { text: p })))));
       const right = h('div', { class: 'pane plain' }, h('div', { class: 'ptitle', text: t.qtitle || 'Which section gives each of these opinions?' }),
         t.questions.map((q, i) => qRow(t, q, i + 1)));
-      content = h('div', { class: 'split' }, left, right);
+      content = resizable(h('div', { class: 'split' }, left, right));
     } else {
       let left;
       if (t.part === '5') {
@@ -619,7 +663,7 @@
           h('span', { class: 'src-label', text: x.label }), x.heading ? h('h3', { text: x.heading }) : null, paras(x.text).map(p => h('p', { text: p })))));
       }
       const right = h('div', { class: 'pane plain' }, t.questions.map((q, i) => choiceCard(t, q, i + 1)));
-      content = h('div', { class: 'split' }, left, right);
+      content = resizable(h('div', { class: 'split' }, left, right));
     }
     S.body = content;
 
@@ -646,9 +690,11 @@
     } });
     S.prev = h('button', { type: 'button', class: 'arrow', 'aria-label': 'Previous question', onclick: () => setCur(Math.max(1, S.cur - 1), true) }, '←');
     S.next = h('button', { type: 'button', class: 'arrow', 'aria-label': 'Next question', onclick: () => setCur(Math.min(N, S.cur + 1), true) }, '→');
-    S.checkBtn = h('button', { type: 'button', class: 'btn primary', onclick: () => (S.checked ? go('#/') : checkAnswers()) }, 'Check answers');
+    S.checkBtn = h('button', { type: 'button', class: 'btn primary', onclick: () => {
+      if (X) { if (S.checked) examResults(); else examNext(); } else if (S.checked) go('#/'); else checkAnswers();
+    } }, X && !X.done ? examNextLabel() : 'Check answers');
     const foot = h('div', { class: 'foot' },
-      h('span', { class: 'plabel', text: `Part ${t.part}` }), pager, S.countEl,
+      X && !X.done ? examNav() : h('span', { class: 'plabel', text: `Part ${t.part}` }), pager, S.countEl,
       h('span', { class: 'spacer' }), S.bm, S.checkBtn, S.prev, S.next);
 
     $('#app').replaceChildren(stage, foot);
@@ -701,11 +747,12 @@
     return best;
   }
 
-  function checkAnswers() {
+  function checkAnswers(opt) {
+    opt = opt || {};
     if (S.checked) return;
     const N = qCount(S.t);
     const blank = S.t.questions.filter((_, i) => !isAnswered(i + 1)).length;
-    if (blank && !confirm(`${blank} of ${N} question${blank > 1 ? 's are' : ' is'} unanswered. Check anyway?`)) return;
+    if (blank && !opt.quiet && !confirm(`${blank} of ${N} question${blank > 1 ? 's are' : ' is'} unanswered. Check anyway?`)) return;
     pauseTimer(); clearInterval(tick); closePopover();
     S.checked = true;
     let score = 0;
@@ -726,8 +773,9 @@
     S.body.classList.add('locked');
     S.body.querySelectorAll('.gap-btn, .opt, .pill').forEach(b => { b.style.pointerEvents = 'none'; });
     const ms = S.elapsed;
-    const entry = { ts: Date.now(), id: S.t.id, part: S.t.part, title: S.t.title, score, total: N * wt, ms };
-    DB.history.push(entry); S.entry = entry; S.score = score;
+    const entry = opt.entry || { ts: Date.now(), id: S.t.id, part: S.t.part, title: S.t.title, score, total: N * wt, ms };
+    if (!opt.entry) DB.history.push(entry);   // an exam review re-uses the entry that was saved when the exam finished
+    S.entry = entry; S.score = score;
     delete DB.progress[S.t.id]; saveDB();
 
     const total = N * wt;
@@ -743,11 +791,11 @@
     const nextT = list[(list.findIndex(x => x.id === S.t.id) + 1) % list.length];
     S.bannerHost.replaceChildren(h('div', { class: 'banner' },
       S.scoreEl,
-      h('div', null, S.pctEl, h('div', { class: 'sub', text: S.elapsed > 0 ? `Time: ${fmtTime(ms)}` : 'Stopwatch was not used' })),
+      h('div', null, S.pctEl, h('div', { class: 'sub', text: X ? 'Exam review' : S.elapsed > 0 ? `Time: ${fmtTime(ms)}` : 'Stopwatch was not used' })),
       h('div', { class: 'acts' },
-        h('button', { type: 'button', class: 'btn', onclick: () => { delete DB.progress[S.t.id]; const t = S.t; leaveTest(); openTest(t); } }, 'Try again'),
-        nextT && nextT.id !== S.t.id ? h('button', { type: 'button', class: 'btn primary', onclick: () => go('#/test/' + encodeURIComponent(nextT.id)) }, 'Next test') : null,
-        h('button', { type: 'button', class: 'btn', onclick: () => go('#/') }, 'Back to list'))));
+        X ? null : h('button', { type: 'button', class: 'btn', onclick: () => { delete DB.progress[S.t.id]; const t = S.t; leaveTest(); openTest(t); } }, 'Try again'),
+        !X && nextT && nextT.id !== S.t.id ? h('button', { type: 'button', class: 'btn primary', onclick: () => go('#/test/' + encodeURIComponent(nextT.id)) }, 'Next test') : null,
+        h('button', { type: 'button', class: 'btn', onclick: () => (X ? examResults() : go('#/')) }, X ? 'Back to results' : 'Back to list'))));
 
     S.refreshScore();
     S.reviewHost.replaceChildren(h('div', { class: 'review' },
@@ -776,7 +824,7 @@
           q.explain ? h('div', { class: 'exp', text: q.explain }) : null);
       })));
 
-    S.checkBtn.textContent = 'Back to list';
+    S.checkBtn.textContent = X ? 'Back to results' : 'Back to list';
     refreshPager();
     S.stage.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -786,10 +834,12 @@
    * ------------------------------------------------------------------ */
   function buildWriting(app) {
     const t = S.t, P = PARTS[t.part];
-    S.choice = 0;
+    const live = X && !X.done, review = X && X.done;
+    S.choice = S.restore && typeof S.restore.choice === 'number' ? S.restore.choice : 0;
 
     const editor = h('textarea', { class: 'editor', placeholder: 'Start writing here…', spellcheck: 'true' });
-    editor.value = '';
+    editor.value = S.restore ? S.restore.text || '' : '';
+    if (review) editor.readOnly = true;
     S.editor = editor;
     const counter = h('span', { class: 'wcount' });
     const [lo, hi] = t.range;
@@ -811,6 +861,7 @@
         h('div', { class: 'pane', style: 'max-height:none' }, h('p', null, h('b', { text: t.task }))));
     } else {
       const btns = t.options.map((o, i) => h('button', { type: 'button', class: 'task', onclick: () => {
+        if (review) return;
         autoStart(); S.choice = i; paintTasks(); saveProgress();
       } }, h('div', { class: 'tag', text: `Question ${i + 2} · ${o.label}` }), h('div', { text: o.prompt })));
       const paintTasks = () => btns.forEach((b, i) => b.classList.toggle('sel', i === S.choice));
@@ -818,8 +869,7 @@
       left = h('div', null, h('div', { class: 'taskpick' }, btns));
     }
 
-    const taskText = () => t.part === 'W1' ? `${t.intro ? t.intro + '\n\n' : ''}${t.texts.map((x, i) => `Text ${i + 1}${x.title ? ' (' + x.title + ')' : ''}:\n${x.text}`).join('\n\n')}\n\n${t.task}`
-      : `[${t.options[S.choice].label}] ${t.options[S.choice].prompt}`;
+    const taskText = () => writingTask(t, S.choice);
 
     const finish = h('button', { type: 'button', class: 'btn primary', onclick: () => {
       const w = countWords(editor.value);
@@ -843,15 +893,162 @@
     const right = h('div', { class: 'editor-wrap' },
       h('div', { class: 'wbar' }, counter, h('span', { class: 'wrange', text: `Target: ${lo}–${hi} words` })),
       editor,
-      h('div', { class: 'wbar' }, finish, copy, clear));
+      h('div', { class: 'wbar' }, live ? clear : review ? [copy, h('button', { type: 'button', class: 'btn', onclick: examResults }, 'Back to results')] : [finish, copy, clear]));
 
     const stage = h('div', { class: 'stage' },
       h('div', { class: 'instr' }, h('b', { text: t.part === 'W1' ? 'Question 1' : 'Questions 2–4' }), h('span', null, rich(P.instr))),
-      h('div', { class: 'wgrid', style: 'margin-top:18px' }, left, right));
-    app.replaceChildren(stage);
+      resizable(h('div', { class: 'wgrid', style: 'margin-top:18px' }, left, right)));
+    if (live) {
+      const next = h('button', { type: 'button', class: 'btn primary', onclick: examNext }, examNextLabel());
+      app.replaceChildren(stage, h('div', { class: 'foot' }, examNav(), h('span', { class: 'spacer' }), next));
+    } else app.replaceChildren(stage);
     updateTimeUI();
   }
 
+
+  /* ------------------------------------------------------------------ *
+   * Exam mode: one random test from each part of a paper, under a single countdown
+   * ------------------------------------------------------------------ */
+  const writingTask = (t, choice) => t.part === 'W1'
+    ? `${t.intro ? t.intro + '\n\n' : ''}${t.texts.map((x, i) => `Text ${i + 1}${x.title ? ' (' + x.title + ')' : ''}:\n${x.text}`).join('\n\n')}\n\n${t.task}`
+    : `[${t.options[choice].label}] ${t.options[choice].prompt}`;
+
+  const EXAMS = {
+    reading: { name: 'Reading and Use of English paper', parts: READING },
+    writing: { name: 'Writing paper', parts: WRITING }
+  };
+
+  // Estimated Cambridge English Scale score for a raw mark out of 72. The real conversion differs from test to test and is not
+  // published, so this is a straight-line estimate between anchor points: 60% is about 200 (grade C), 75% about 213 (B), 85% about 220 (A).
+  const SCALE_POINTS = [[0, 120], [0.6, 200], [0.75, 213], [0.85, 220], [1, 230]];
+  function scaleScore(raw, total) {
+    const r = total ? raw / total : 0;
+    for (let i = 1; i < SCALE_POINTS.length; i++) {
+      const [x0, y0] = SCALE_POINTS[i - 1], [x1, y1] = SCALE_POINTS[i];
+      if (r <= x1) return Math.round(y0 + (y1 - y0) * (r - x0) / (x1 - x0));
+    }
+    return 230;
+  }
+  function gradeOf(scale) {
+    if (scale >= 220) return 'Grade A';
+    if (scale >= 213) return 'Grade B';
+    if (scale >= 200) return 'Grade C';
+    if (scale >= 180) return 'Level C1';
+    return 'Below C1';
+  }
+
+  function viewExamStart() {
+    const app = $('#app');
+    const card = (key, lines) => h('div', { class: 'examcard' }, h('h2', { text: EXAMS[key].name }),
+      h('ul', null, lines.map(l => h('li', { text: l }))),
+      h('button', { type: 'button', class: 'btn primary', onclick: () => examStart(key) }, 'Start the paper'));
+    app.replaceChildren(h('div', { class: 'page' },
+      h('h1', { text: 'Exam mode' }),
+      h('p', { class: 'lead', text: 'A full paper under exam conditions: one test picked at random from each part (tests you have not done yet are preferred) and a countdown of 1 hour 30 minutes. You can move between the parts freely, but there is no pause and no feedback until you finish, and leaving the page ends the attempt.' }),
+      h('div', { class: 'examcards' },
+        card('reading', ['Parts 1–7: 53 questions, 72 marks', 'Marked when you finish or when time runs out', 'Gives an estimated score on the 180–230 scale and a grade']),
+        card('writing', ['Part 1 (essay) and Part 2 (choice of task)', 'Both answers are saved to History', 'Afterwards you can copy them out for feedback']))));
+    app.className = '';
+  }
+
+  function examStart(key) {
+    const tests = EXAMS[key].parts.map(p => {
+      const all = testsOf(p), fresh = all.filter(t => !DB.history.some(x => x.id === t.id));
+      const pool = fresh.length ? fresh : all;
+      return pool[Math.floor(Math.random() * pool.length)];
+    });
+    if (tests.some(t => !t)) { alert('Some parts have no tests yet.'); return; }
+    leaveTest();
+    X = { key, tests, idx: 0, state: {}, deadline: Date.now() + EXAM_MS, done: false, entries: [] };
+    openTest(tests[0]);
+  }
+
+  function examSave() {
+    if (!S || S.checked || !X || X.done) return;
+    X.state[X.idx] = S.writing ? { text: S.editor.value, choice: S.choice }
+      : { answers: Object.assign({}, S.answers), flags: Object.assign({}, S.flags) };
+  }
+  function examGo(i) { examSave(); leaveTest(); X.idx = i; openTest(X.tests[i]); }
+  const examNextLabel = () => (X.idx === X.tests.length - 1 ? 'Finish paper' : 'Next part');
+  function examNext() {
+    if (X.idx < X.tests.length - 1) examGo(X.idx + 1);
+    else if (confirm('Finish the paper and see your results?')) examFinish(false);
+  }
+  function examNav() {
+    return h('div', { class: 'examnav' }, h('span', { class: 'plabel', text: 'Part' }),
+      X.tests.map((t, i) => h('button', { type: 'button', class: i === X.idx ? 'cur' : '', 'aria-label': 'Go to part ' + t.part.replace('W', ''),
+        onclick: () => { if (i !== X.idx) examGo(i); } }, t.part.replace('W', ''))));
+  }
+
+  function examFinish(timeUp) {
+    if (!X || X.done) return;
+    examSave();
+    X.done = true; X.timeUp = timeUp; X.spent = Math.min(Date.now(), X.deadline) - (X.deadline - EXAM_MS);
+    clearInterval(tick); closePopover(); closeNotes(); hideTool();
+    S = null; $('#hdr-tools').replaceChildren();
+    X.tests.forEach((t, i) => {
+      const st = X.state[i] || {};
+      let entry = null;
+      if (t.part[0] === 'W') {
+        const text = st.text || '', words = countWords(text);
+        if (words) entry = { ts: Date.now(), id: t.id, part: t.part, title: t.title, words, ms: 0, text, task: writingTask(t, st.choice || 0), exam: true };
+      } else {
+        const wt = WEIGHT[t.part], ans = st.answers || {};
+        let score = 0;
+        t.questions.forEach((q, k) => {
+          const v = ans[k + 1], ph = t.part === '4' ? partHits(q, v) : null;
+          score += (isCorrect(t, q, v) || (ph && ph.n === 2)) ? wt : (ph ? ph.n : 0);
+        });
+        entry = { ts: Date.now(), id: t.id, part: t.part, title: t.title, score, total: t.questions.length * wt, ms: 0, exam: true };
+      }
+      if (entry) DB.history.push(entry);
+      X.entries[i] = entry;
+    });
+    saveDB();
+    viewExamResults();
+  }
+
+  function examResults() { leaveTest(); viewExamResults(); }
+  function examReview(i) {
+    leaveTest(); X.idx = i;
+    openTest(X.tests[i]);
+    if (S.writing) { S.checked = true; pauseTimer(); updateTimeUI(); }
+    else checkAnswers({ quiet: true, entry: X.entries[i] });
+  }
+
+  function viewExamResults() {
+    const app = $('#app'), isW = X.key === 'writing';
+    let got = 0, tot = 0;
+    const rows = X.tests.map((t, i) => {
+      const e = X.entries[i];
+      if (!isW) { got += e.score; tot += e.total; }
+      return h('tr', null,
+        h('td', { text: 'Part ' + t.part.replace('W', '') }),
+        h('td', null, h('b', { text: t.title }), h('br'), h('small', { text: PARTS[t.part].name })),
+        h('td', { text: isW ? (e ? `${e.words} words` : 'Not attempted') : `${e.score} / ${e.total}` }),
+        h('td', null, h('button', { type: 'button', class: 'btn small', onclick: () => examReview(i) }, 'Review')));
+    });
+    let head;
+    if (isW) {
+      head = h('p', { class: 'lead', text: 'Your writing has been saved to History. Use Review, then “Copy for feedback”, to have it assessed.' });
+    } else {
+      const sc = scaleScore(got, tot);
+      head = h('div', { class: 'examscore' },
+        h('div', { class: 'big', text: String(sc) }),
+        h('div', null, h('div', { class: 'grade', text: gradeOf(sc) }),
+          h('div', { class: 'sub', text: `${got} / ${tot} marks · estimated on the 180–230 scale` })));
+    }
+    app.replaceChildren(h('div', { class: 'page' },
+      h('h1', { text: EXAMS[X.key].name + (X.timeUp ? ' – time is up' : ' – finished') }),
+      h('p', { class: 'lead', text: `Time used: ${fmtTime(X.spent)} of 1:30:00.` }),
+      head,
+      h('table', { class: 'stats' }, h('thead', null, h('tr', null, ['Part', 'Test', isW ? 'Length' : 'Marks', ''].map(c => h('th', { text: c })))), h('tbody', null, rows)),
+      isW ? null : h('p', { class: 'sub', text: 'The scale score is an estimate: Cambridge converts marks to the scale differently for every paper, so a real result can differ. Grades: A 220–230, B 213–219, C 200–212, Level C1 180–199.' }),
+      h('div', { class: 'toolbar' },
+        h('button', { type: 'button', class: 'btn primary', onclick: () => examStart(X.key) }, 'New paper'),
+        h('button', { type: 'button', class: 'btn', onclick: () => go('#/') }, 'Back to list'))));
+    app.className = '';
+  }
 
   /* ------------------------------------------------------------------ *
    * Highlight and notes: select text in a passage, then choose Note or Highlight
