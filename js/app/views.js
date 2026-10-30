@@ -48,7 +48,7 @@
 
     app.replaceChildren(h('div', { class: 'page' },
       h('h1', { text: 'Practice library' }),
-      h('p', { class: 'lead', text: 'Pick any test from any part, in any order. Your answers, stopwatch time and results are saved in this browser.' }),
+      h('p', { class: 'lead', text: 'Pick any test from any part, in any order. Your results are saved in this browser.' }),
       jump,
       reading.length ? h('div', { class: 'group-title', text: 'Reading and Use of English' }) : null,
       reading.map(section),

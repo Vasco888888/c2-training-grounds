@@ -213,7 +213,7 @@
       content = resizable(h('div', { class: 'split' }, h('div', { class: 'pane plain' }, h('div', { class: 'ptitle', text: t.heading || t.title }), subtitle, cloze), pool));
     } else if (t.part === '7') {
       const left = h('div', { class: 'pane plain' }, h('div', { class: 'ptitle', text: t.heading || t.title }), subtitle,
-        t.sections.map(x => h('div', { class: 'sec' }, h('div', { class: 'sechead' }, h('b', { text: x.label }), h('b', { text: x.heading || '' })),
+        t.sections.map(x => h('div', { class: 'sec' }, h('div', { class: 'sechead' }, h('b', { text: x.label }), t.choose === 'section' ? null : h('b', { text: x.heading || '' })),
           paras(x.text).map(p => h('p', { text: p })))));
       const right = h('div', { class: 'pane plain' }, h('div', { class: 'ptitle', text: t.qtitle || 'Which section gives each of these opinions?' }),
         t.questions.map((q, i) => qRow(t, q, i + 1)));
