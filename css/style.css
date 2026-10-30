@@ -330,13 +330,18 @@ body.notes-open #app { margin-right: 330px; }
 .examnav button.cur { border-color: var(--teal); font-weight: 700; }
 .examnav .plabel { margin-right: 6px; }
 .examcards { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 18px; }
-.examcard { flex: 1 1 280px; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; }
+.examcard { flex: 1 1 280px; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px;  display: flex; flex-direction: column; }
 .examcard h2 { margin: 0 0 8px; font-size: 20px; }
 .examcard ul { margin: 0 0 16px; padding-left: 20px; line-height: 1.6; }
-.examscore { display: flex; align-items: center; gap: 18px; margin: 14px 0 18px; }
-.examscore .big { font-size: 56px; font-weight: 700; color: var(--teal-dark); line-height: 1; }
-.examscore .grade { font-size: 22px; font-weight: 700; }
-.examscore .sub, .page .sub { color: var(--muted); }
+.examcard .btn { margin-top: auto; align-self: flex-start; }
+.page .sub { color: var(--muted); }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+.examscores { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin: 22px 0 26px; }
+.examsec .big { font-size: 60px; font-weight: 700; line-height: 1.05; margin-top: 4px; }
+.examsec .grade { font-size: 20px; font-weight: 700; margin-top: 2px; }
+.examsec.m1 .big { color: var(--navy); }
+.examsec.m2 .big { color: var(--teal); }
+.examsec .sub { margin-top: 4px; }
 
 /* ---------- resizable split ---------- */
 .split.resizable, .wgrid.resizable { grid-template-columns: minmax(0, var(--lw, 1fr)) 22px minmax(0, var(--rw, 1fr)); gap: 0; }
@@ -350,7 +355,7 @@ body.notes-open #app { margin-right: 330px; }
 }
 
 /* ---------- grade chart ---------- */
-.gradechart { width: 100%; max-width: 680px; height: auto; display: block; margin: 0 0 18px; }
+.gradechart { width: 100%; max-width: 240px; height: auto; display: block; margin: 8px 0 0; }
 .gradechart .band { fill: var(--line); }
 .gradechart .band-c1 { fill: #cfe3e0; }
 .gradechart .band-c { fill: #8fc4bd; }
@@ -359,5 +364,15 @@ body.notes-open #app { margin-right: 330px; }
 .gradechart .band-label { font-size: 12px; font-weight: 700; fill: var(--navy); }
 .gradechart .band-b + .band-label, .gradechart .band-a + .band-label { fill: #fff; }
 .gradechart .tick { font-size: 12px; fill: var(--muted); }
-.gradechart .marker { fill: var(--navy); }
-.gradechart .marker-label { font-size: 14px; font-weight: 700; fill: var(--navy); }
+.gradechart .marker.m1 { fill: var(--navy); }
+.gradechart .marker.m2 { fill: var(--teal); }
+.gradechart .marker-label { font-size: 13px; font-weight: 700; }
+.gradechart .marker-label.m1 { fill: var(--navy); }
+.gradechart .marker-label.m2 { fill: var(--teal); }
+
+
+.examres { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 32px; align-items: start; }
+.examres-side { position: sticky; top: 12px; padding-top: 6px; }
+@media (max-width: 900px) { .examres { grid-template-columns: 1fr; } .examres-side { position: static; } }
+
+@media (max-width: 600px) { .examscores { grid-template-columns: 1fr; gap: 14px; } }

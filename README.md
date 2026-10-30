@@ -18,7 +18,7 @@ Designed to mimic the official C2 Proficiency digital exam: the same parts, ques
 ## Features
 
 - **Exam conditions**: the stopwatch starts by itself, and a test can't be paused, saved halfway or resumed. Leave it and the attempt is gone.
-- **Exam mode**: a full Reading and Use of English paper (one random test from each of Parts 1–7) or a Writing paper (Parts 1 and 2), each under a 1 hour 30 minute countdown. Move freely between parts, with no pause and no feedback until you finish. The Reading paper is marked out of 72 and converted to an estimated score on the 180–230 scale with a grade (A 220–230, B 213–219, C 200–212, Level C1 180–199).
+- **Exam mode**: a full Reading and Use of English paper (one random test from each of Parts 1–7) or a Writing paper (Parts 1 and 2), each under a 1 hour 30 minute countdown. Move freely between parts, with no pause and no feedback until you finish. The Reading and Use of English paper is marked out of 72, and Reading (Parts 1, 5, 6, 7) and Use of English (Parts 2, 3, 4) each get an estimated score on the 180–230 scale with a grade (A 220–230, B 213–219, C 200–212, Level C1 180–199), based on a community conversion table.
 - **Instant scoring** with a full explanation for every question, showing why the answer is right and why the other options fail.
 - **Official-style marking**: Part 4 answers are split into two parts worth one mark each, and Parts 4, 5 and 6 count double, so the paper totals 72 marks as in the real exam.
 - **British English** throughout, with US and UK spellings both accepted in typed answers.

@@ -13,17 +13,12 @@
     writing: { name: 'Writing paper', parts: WRITING }
   };
 
-  // Estimated Cambridge English Scale score for a raw mark out of 72. The real conversion differs from test to test and is not
-  // published, so this is a straight-line estimate between anchor points: 60% is about 200 (grade C), 75% about 213 (B), 85% about 220 (A).
-  const SCALE_POINTS = [[0, 120], [0.6, 200], [0.75, 213], [0.85, 220], [1, 230]];
-  function scaleScore(raw, total) {
-    const r = total ? raw / total : 0;
-    for (let i = 1; i < SCALE_POINTS.length; i++) {
-      const [x0, y0] = SCALE_POINTS[i - 1], [x1, y1] = SCALE_POINTS[i];
-      if (r <= x1) return Math.round(y0 + (y1 - y0) * (r - x0) / (x1 - x0));
-    }
-    return 230;
-  }
+  // Estimated Cambridge English Scale score. Cambridge does not publish its conversion, so this uses the community tables from
+  // cambridge-score.com: marks on Parts 1, 5, 6 and 7 (out of 44) and on Parts 2, 3 and 4 (out of 28) are each converted, and the
+  // two results are averaged. A 0 means the marks are too low to be reported.
+  const SCALE_READING = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,162,164,167,169,171,173,176,178,180,183,187,190,193,197,200,203,205,208,210,213,215,218,220,221,223,224,225,226,228,229,230];
+  const SCALE_USE = [0,0,0,0,0,0,0,0,0,162,167,171,176,180,185,190,195,200,204,208,212,216,220,222,223,225,227,228,230];
+  const scaleScore = (readingMarks, useMarks) => Math.ceil((SCALE_READING[readingMarks] + SCALE_USE[useMarks]) / 2);
   function gradeOf(scale) {
     if (scale >= 220) return 'Grade A';
     if (scale >= 213) return 'Grade B';
@@ -32,28 +27,34 @@
     return scale >= 162 ? 'Below C1' : 'Not reported';
   }
 
-  // The grade bands drawn to scale, with a marker at the estimated score
-  function gradeChart(sc) {
-    const NS = 'http://www.w3.org/2000/svg', LO = 162, HI = 230, X0 = 20, W = 640;
-    const x = v => X0 + (Math.min(HI, Math.max(LO, v)) - LO) / (HI - LO) * W;
+  // The grade bands drawn to scale as one vertical bar, with a marker for each estimated score
+  function gradeChart(markers) {
+    const NS = 'http://www.w3.org/2000/svg', LO = 162, HI = 230, TOP = 24, H = 600, BX = 150, BW = 44;
+    const y = v => TOP + (HI - Math.min(HI, Math.max(LO, v))) / (HI - LO) * H;
     const el = (tag, attrs, text) => {
       const e = document.createElementNS(NS, tag);
       Object.keys(attrs || {}).forEach(k => e.setAttribute(k, attrs[k]));
       if (text !== undefined) e.textContent = text;
       return e;
     };
-    const bands = [[162, 180, 'Below C1', 'band-low'], [180, 200, 'Level C1', 'band-c1'], [200, 213, 'Grade C', 'band-c'], [213, 220, 'Grade B', 'band-b'], [220, 230, 'Grade A', 'band-a']];
-    const svg = el('svg', { viewBox: '0 0 680 112', class: 'gradechart', role: 'img',
-      'aria-label': `Estimated score ${sc >= 180 ? sc : 'below 180'} on a scale with Grade A 220 to 230, Grade B 213 to 219, Grade C 200 to 212, Level C1 180 to 199` });
-    bands.forEach(([a, b, label, cls], i) => {
-      const x1 = x(a) + (i ? 1 : 0), x2 = x(b === 230 ? 230 : b) - (i < bands.length - 1 ? 1 : 0);
-      svg.append(el('rect', { x: x1, y: 38, width: x2 - x1, height: 30, rx: 4, class: 'band ' + cls }));
-      svg.append(el('text', { x: (x1 + x2) / 2, y: 57, class: 'band-label', 'text-anchor': 'middle' }, label));
+    const shown = v => (v >= 180 ? String(v) : '< 180');
+    const bands = [[230, 220, 'A', 'band-a'], [220, 213, 'B', 'band-b'], [213, 200, 'C', 'band-c'], [200, 180, 'C1', 'band-c1'], [180, 162, 'Below', 'band-low']];
+    const svg = el('svg', { viewBox: '0 0 240 652', class: 'gradechart', role: 'img',
+      'aria-label': 'Estimated scores: ' + markers.map(m => m.label + ' ' + shown(m.v)).join(', ') + '. Grade A is 220 to 230, B 213 to 219, C 200 to 212, Level C1 180 to 199.' });
+    bands.forEach(([hi, lo, label, cls], i) => {
+      const y1 = y(hi) + (i ? 1 : 0), y2 = y(lo) - (i < bands.length - 1 ? 1 : 0);
+      svg.append(el('rect', { x: BX, y: y1, width: BW, height: y2 - y1, rx: 4, class: 'band ' + cls }));
+      svg.append(el('text', { x: BX + BW / 2, y: (y1 + y2) / 2 + 4, class: 'band-label', 'text-anchor': 'middle' }, label));
     });
-    [162, 180, 200, 213, 220, 230].forEach(v => svg.append(el('text', { x: x(v), y: 90, class: 'tick', 'text-anchor': 'middle' }, String(v))));
-    const mx = x(sc);
-    svg.append(el('path', { d: `M${mx - 7} 22 L${mx + 7} 22 L${mx} 36 Z`, class: 'marker' }));
-    svg.append(el('text', { x: Math.min(640, Math.max(40, mx)), y: 15, class: 'marker-label', 'text-anchor': 'middle' }, sc >= 180 ? String(sc) : '< 180'));
+    [230, 220, 213, 200, 180, 162].forEach(v => svg.append(el('text', { x: BX + BW + 8, y: y(v) + 4, class: 'tick' }, String(v))));
+    // top marker first, so that when two scores are close the lower label is the one pushed down
+    let lastLabelY = -99;
+    markers.map((m, i) => ({ m, i, ty: y(m.v) })).sort((p, q) => p.ty - q.ty).forEach(({ m, i, ty }) => {
+      const ly = Math.max(ty, lastLabelY + 18);   // keep two close labels from overlapping
+      lastLabelY = ly;
+      svg.append(el('path', { d: `M${BX - 16} ${ty - 7} L${BX - 16} ${ty + 7} L${BX - 3} ${ty} Z`, class: 'marker m' + (i + 1) }));
+      svg.append(el('text', { x: BX - 22, y: ly + 4, class: 'marker-label m' + (i + 1), 'text-anchor': 'end' }, m.label + ' ' + shown(m.v)));
+    });
     return svg;
   }
 
@@ -66,7 +67,7 @@
       h('h1', { text: 'Exam mode' }),
       h('p', { class: 'lead', text: 'A full paper under exam conditions: one test picked at random from each part (tests you have not done yet are preferred) and a countdown of 1 hour 30 minutes. You can move between the parts freely, but there is no pause and no feedback until you finish, and leaving the page ends the attempt.' }),
       h('div', { class: 'examcards' },
-        card('reading', ['Parts 1–7: 53 questions, 72 marks', 'Marked when you finish or when time runs out', 'Gives an estimated score on the 180–230 scale and a grade']),
+        card('reading', ['Parts 1–7: 53 questions, 72 marks', 'Marked when you finish or when time runs out', 'Gives separate estimated scores for Reading and Use of English on the 180–230 scale, with a grade for each']),
         card('writing', ['Part 1 (essay) and Part 2 (choice of task)', 'Both answers are saved to History', 'Afterwards you can copy them out for feedback']))));
     app.className = '';
   }
@@ -146,27 +147,37 @@
       return h('tr', null,
         h('td', { text: 'Part ' + t.part.replace('W', '') }),
         h('td', null, h('b', { text: t.title }), h('br'), h('small', { text: PARTS[t.part].name })),
-        h('td', { text: isW ? (e ? `${e.words} words` : 'Not attempted') : `${e.right} / ${t.questions.length}` }),
+        h('td', { text: isW ? (e ? `${e.words} words` : 'Not attempted') : (t.part === '4' ? `${e.score} / ${e.total}` : `${e.right} / ${t.questions.length}`) }),
         h('td', null, h('button', { type: 'button', class: 'btn small', onclick: () => examReview(i) }, 'Review')));
     });
-    let head;
+    let head, side = null;
     if (isW) {
       head = h('p', { class: 'lead', text: 'Your writing has been saved to History. Use Review, then “Copy for feedback”, to have it assessed.' });
     } else {
-      const sc = scaleScore(got, tot);
-      head = h('div', null, h('div', { class: 'examscore' },
+      const marksOf = parts => X.tests.reduce((n, t, i) => n + (parts.includes(t.part) ? X.entries[i].score : 0), 0);
+      // Reading (Parts 1, 5, 6, 7) and Use of English (Parts 2, 3, 4) each get their own scale score
+      const rm = marksOf(['1', '5', '6', '7']), um = marksOf(['2', '3', '4']);
+      const rs = SCALE_READING[rm], us = SCALE_USE[um];
+      const section = (cls, label, parts, marks, max, sc) => h('div', { class: 'examsec ' + cls },
+        h('div', { class: 'eyebrow', text: label }),
         h('div', { class: 'big', text: sc >= 180 ? String(sc) : '< 180' }),
-        h('div', null, h('div', { class: 'grade', text: gradeOf(sc) }),
-          h('div', { class: 'sub', text: `${got} / ${tot} marks · estimated on the 180–230 scale` }))), gradeChart(sc));
+        h('div', { class: 'grade', text: gradeOf(sc) }),
+        h('div', { class: 'sub', text: `${marks} / ${max} marks · ${parts}` }));
+      head = h('div', { class: 'examscores' },
+        section('m1', 'Reading', 'Parts 1, 5 (×2), 6 (×2), 7', rm, 44, rs),
+        section('m2', 'Use of English', 'Parts 2, 3, 4', um, 28, us));
+      side = h('aside', { class: 'examres-side' }, gradeChart([{ label: 'Reading', v: rs }, { label: 'Use of English', v: us }]));
     }
+    const main = h('div', { class: 'examres-main' },
+      head,
+      h('table', { class: 'stats' }, h('thead', null, h('tr', null, ['Part', 'Test', isW ? 'Length' : 'Correct', ''].map(c => h('th', { text: c })))), h('tbody', null, rows)),
+      isW ? null : h('p', { class: 'sub', text: 'The scale scores are estimates from a community conversion table, not an official one: Cambridge sets its conversion separately for every paper, so a real result can differ.' }),
+      h('div', { class: 'toolbar' },
+        h('button', { type: 'button', class: 'btn primary', onclick: () => examStart(X.key) }, 'New paper'),
+        h('button', { type: 'button', class: 'btn', onclick: () => go('#/') }, 'Back to list')));
     app.replaceChildren(h('div', { class: 'page' },
       h('h1', { text: EXAMS[X.key].name + (X.timeUp ? ' – time is up' : ' – finished') }),
       h('p', { class: 'lead', text: `Time used: ${fmtTime(X.spent)} of 1:30:00.` }),
-      head,
-      h('table', { class: 'stats' }, h('thead', null, h('tr', null, ['Part', 'Test', isW ? 'Length' : 'Correct', ''].map(c => h('th', { text: c })))), h('tbody', null, rows)),
-      isW ? null : h('p', { class: 'sub', text: 'The scale score is an estimate: Cambridge converts marks to the scale differently for every paper, so a real result can differ.' }),
-      h('div', { class: 'toolbar' },
-        h('button', { type: 'button', class: 'btn primary', onclick: () => examStart(X.key) }, 'New paper'),
-        h('button', { type: 'button', class: 'btn', onclick: () => go('#/') }, 'Back to list'))));
+      h('div', { class: side ? 'examres' : '' }, main, side)));
     app.className = '';
   }
