@@ -171,7 +171,7 @@
     const main = h('div', { class: 'examres-main' },
       head,
       h('table', { class: 'stats' }, h('thead', null, h('tr', null, ['Part', 'Test', isW ? 'Length' : 'Correct', ''].map(c => h('th', { text: c })))), h('tbody', null, rows)),
-      isW ? null : h('p', { class: 'sub', text: 'The scale scores are estimates from a community conversion table, not an official one: Cambridge sets its conversion separately for every paper, so a real result can differ.' }),
+      isW ? null : h('p', { class: 'sub', text: 'The scale scores are estimates and not official.' }),
       h('div', { class: 'toolbar' },
         h('button', { type: 'button', class: 'btn primary', onclick: () => examStart(X.key) }, 'New paper'),
         h('button', { type: 'button', class: 'btn', onclick: () => go('#/') }, 'Back to list')));

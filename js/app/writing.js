@@ -63,7 +63,7 @@
     } }, 'Clear');
 
     const right = h('div', { class: 'editor-wrap' },
-      h('div', { class: 'wbar' }, counter, h('span', { class: 'wrange', text: `Target: ${lo}–${hi} words` })),
+      h('div', { class: 'wbar' }, counter),
       editor,
       h('div', { class: 'wbar' }, live ? clear : review ? [copy, h('button', { type: 'button', class: 'btn', onclick: examResults }, 'Back to results')] : [finish, copy, clear]));
 

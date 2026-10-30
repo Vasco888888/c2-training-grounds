@@ -104,7 +104,7 @@ button { cursor: pointer; }
 .instr {
   background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 14px 18px; margin-bottom: 18px;
 }
-.instr b { display: block; font-size: 17px; margin-bottom: 4px; }
+.instr > b { display: block; font-size: 17px; margin-bottom: 4px; }
 .instr span { font-size: 16px; }
 .ptitle { font-size: 28px; margin: 18px 0 14px; font-weight: 700; }
 
@@ -234,7 +234,6 @@ input.gap { width: 150px; }
 .wcount.low { color: var(--muted); }
 .wcount.good { color: var(--ok); }
 .wcount.high { color: var(--bad); }
-.wrange { color: var(--muted); font-size: 14px; }
 .taskpick { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
 .task { text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; line-height: 1.5; }
 .task:hover { border-color: var(--teal); }
