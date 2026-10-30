@@ -8,31 +8,31 @@
 
 {1}
 
-By seven we had reached the salt flats themselves, where the first cutters were already at work. They squatted in pairs on the crust, one scoring the surface with an axe, the other levering up slabs the size of paving stones, and not one of them so much as glanced up as we passed.
+By seven we had reached the salt flats themselves, where the first cutters were already at work. The ground there is a startling mosaic of white, rust and sulphur yellow. The cutters squatted in pairs on the crust, one scoring the surface with an axe, the other levering up slabs the size of paving stones, and not one of them so much as glanced up as we passed.
 
 {2}
 
-His present herd is almost as unruly, and loading it is an exercise in patience. Each slab is wrapped in palm matting and balanced against its twin, since a lopsided load will rub a camel raw within a day.
+His present herd is almost as unruly, and loading it is an exercise in patience. Each slab is wrapped in palm matting and balanced against its twin, since a lopsided load will rub a camel raw within a day. Ahmed's men can prepare an animal in a few minutes, whereas my own attempt to help produced a heap of slabs and a look of weary tolerance from the camel.
 
 {3}
 
-Ahmed, of course, had noticed, but he said nothing until early afternoon, when he handed me a strip of cloth and showed me how to wind it across my face. "The camels suffer too," he said, "and they do not complain half as much as you." It was the closest he came to a joke all week.
+Ahmed, of course, had noticed, but he said nothing until early afternoon, when he handed me a strip of cloth and showed me how to wind it across my face. It smelled of woodsmoke and old sweat, and I was in no position to object. "The camels suffer too," he said, "and they do not complain half as much as you." It was the closest he came to a joke all week.
 
 {4}
 
-That first night, though, sleep was hard to come by. The ground gave back the day's heat for hours, and somewhere beyond the circle of firelight a pair of hyenas kept up a rasping conversation. When Ahmed finally shook my shoulder, it felt as though I had closed my eyes a moment before.
+That first night, though, sleep was hard to come by. The ground gave back the day's heat for hours, and somewhere beyond the circle of firelight a pair of hyenas kept up a rasping conversation. I lay listening to the animals shift and sigh beside me. When Ahmed finally shook my shoulder, it felt as though I had closed my eyes a moment before.
 
 {5}
 
-Their instinct was sound. The escarpment, when we reached its foot, rose in a series of rocky steps, and the track, worn smooth by centuries of hooves, was barely wide enough for a loaded animal. Ahmed walked at the head of the line and I at the back, and for hours I could see nothing but the swaying slabs ahead of me.
+Their instinct was sound. The escarpment, when we reached its foot, rose in a series of rocky steps, and the track, worn smooth by centuries of hooves, was barely wide enough for a loaded animal. Twice a camel balked at a ledge and had to be coaxed forward and once a slab slipped and shattered on the rocks below. Ahmed walked at the head of the line and I at the back, and for hours I could see nothing but the swaying slabs ahead of me.
 
 {6}
 
-Ahmed, by contrast, looked like a man who had come home. In the market yard he unloaded the first slab with the air of someone who has reached the one place where his labour is properly valued, and within the hour a trader had counted a small pile of notes into his palm. The price, I later calculated, was less than I had paid for lunch in the capital.
+Ahmed, by contrast, looked like a man who had come home. All around him traders were calling out greetings by name, and boys darted between the animals with glasses of tea. In the market yard he unloaded the first slab with the air of someone who has reached the one place where his labour is properly valued, and within the hour a trader had counted a small pile of notes into his palm. The price, I later calculated, was less than I had paid for lunch in the capital.
 
 {7}
 
-"It is not about the money," he said at last. "It is about the road." It had been his father's, he explained, and his grandfather's, and a man who stops walking it ceases to belong to something larger than himself. Then he went to check the camels, because there were still thirty of them to water.`,
+"It is not about the money," he said at last. I had been braced for talk of wages, and the plainness of his answer silenced me. "It is about the road." It had been his father's, he explained, and his grandfather's, and a man who stops walking it ceases to belong to something larger than himself. Then he went to check the camels, because there were still thirty of them to water.`,
   paragraphs: [
     { label: 'A', text: 'Strangers are not unusual on the flats, but the work allows no pause, and the cutters are paid by the slab rather than by the hour. Ahmed explained this without a trace of sympathy. He had cut salt himself as a boy, he told me, saving for years until he could afford a camel of his own: a cantankerous grey male that died long ago, but of which he still speaks with something close to affection.' },
     { label: 'B', text: 'The next five days followed the same pattern, and with each one the landscape grew a little less hostile. The flats gave way to crumbling lava fields and then, abruptly, to the first thorn bushes I had seen since leaving the road. Even Ahmed, who rarely commented on anything, hummed under his breath. The camels quickened their pace, as though they could already smell the highlands.' },
@@ -61,31 +61,31 @@ Ahmed, by contrast, looked like a man who had come home. In the market yard he u
 
 {1}
 
-The mechanism itself was neither rare nor beautiful, but it was honest, and in its worn pinions she read the story of every winter it had survived. Within a year she had taken a pay cut to apprentice herself to an elderly restorer in Derbyshire, and her former colleagues assumed she was having a breakdown.
+The mechanism itself was neither rare nor beautiful, but it was honest, and in its worn pinions she read the story of every winter it had survived: a hard frost that had seized the bearings, a sexton who had oiled all the wrong parts, a wartime year when nobody had climbed the tower at all. Within a year she had taken a pay cut to apprentice herself to an elderly restorer in Derbyshire, and her former colleagues assumed she was having a breakdown.
 
 {2}
 
-Clients are not always persuaded, and some say so loudly. "Everyone wants a clock to look as it did the day it was made," she says, "but a clock only looks like that for about a week. After that it starts to acquire a history, and the history is the interesting part."
+Clients are not always persuaded, and some say so loudly. A few would happily see every surface polished until it shone like a trumpet, and one parish council, offered a clock restored with all its scars, asked whether she could at least have the dial repainted. "Everyone wants a clock to look as it did the day it was made," she says, "but a clock only looks like that for about a week. After that it starts to acquire a history, and the history is the interesting part."
 
 {3}
 
-Not every client sees the point of reproducing a mistake, and the odd commission has gone elsewhere as a result. She accepts that. "If I have made a clock indistinguishable from a new one," she says, "I have done something wrong." She is not, she insists, against repair, only against erasure.
+Not every client sees the point of reproducing a mistake, and the odd commission has gone elsewhere as a result. She accepts that, pointing out that a reputation is built on the clocks still running in fifty years' time, not on those that look best at the unveiling. "If I have made a clock indistinguishable from a new one," she says, "I have done something wrong." She is not, she insists, against repair, only against erasure.
 
 {4}
 
-It is not something a manual can teach, she believes. "The knowledge lives in the hands," she says, "and the hands in question are retiring." By her reckoning there are fewer than a dozen full-time restorers of turret clocks left in the country, and most of them are over sixty.
+That kind of patience is not something a manual can teach, she believes. She has tried to write her methods down more than once, and each attempt has read like a recipe composed by someone who has never tasted food; the feel of a file beginning to bite, or of a pivot running true, resists description. "The knowledge lives in the hands," she says, "and the hands in question are retiring." By her reckoning there are fewer than a dozen full-time restorers of turret clocks left in the country, and most of them are over sixty.
 
 {5}
 
-"I assumed it was a test," he admits. "It was, but not the kind I expected. She wanted to see whether I would rush." Marlowe says only that he did not, and returns to her bench.
+"I assumed it was a test," he admits. "It was, but not the kind I expected. By the second week I had stopped glancing at the wall clock, which was wrong by eleven minutes anyway. She wanted to see whether I would rush." Marlowe says only that he did not, and returns to her bench.
 
 {6}
 
-Her case is partly practical, since electric movements fail whereas a well-kept mechanical one can run for two centuries and be mended with a file and a steady hand. But it is also, she concedes, a matter of sentiment. "People think a clock is just a way of knowing the time," she says. "It is also a way of knowing who kept it going."
+Her case is partly practical, since electric movements fail whereas a well-kept mechanical one can run for two centuries and be mended with a file and a steady hand. But it is also, she concedes, a matter of sentiment. Inside the cases she has opened, she points out, earlier clockmakers pencilled their initials and the date, and she adds her own beside them. "People think a clock is just a way of knowing the time," she says. "It is also a way of knowing who kept it going."
 
 {7}
 
-"Anyone can hear a bell," she tells me as I leave. "What I want to know is whether the thing is breathing properly." Then she picks up a file and returns to the teeth of the next wheel.`,
+"Anyone can hear a bell," she tells me as I leave. "What I want to know is whether the thing is breathing properly." Then she picks up a file and returns to the teeth of the next wheel. Outside, the lane is quiet, and for a moment I find myself listening for something I cannot quite hear.`,
   paragraphs: [
     { label: 'A', text: 'Persuading the people who pay for the work is harder. Churchwardens faced with a repair bill of several thousand pounds often ask whether the clock could simply be fitted with an electric movement, leaving the old machinery to gather dust. Marlowe has heard the suggestion so often that she tends to answer it before it is made, and her answer never varies.' },
     { label: 'B', text: 'Repair, in practice, means making what cannot be bought. No supplier stocks a replacement for a Victorian escape wheel, so she cuts the teeth by hand on a dividing engine older than her grandmother, checking each against a template. A single slip means starting the whole wheel again, and she has done so more often than she cares to remember. "The job is ninety per cent patience," she says.' },
@@ -100,7 +100,7 @@ Her case is partly practical, since electric movements fail whereas a well-kept 
     { answer: 'F', explain: 'Her route into the trade ends with the stopped tower clock, which "The mechanism itself" refers to; "a pay cut" and "former colleagues" need the engineering career mentioned here. H also suits the wheel in the opening, but it would give no previous job and no clock for the next paragraph.' },
     { answer: 'C', explain: 'Pyke, the "elderly restorer", and his rule that nothing is replaced until understood are what clients "are not always persuaded" by, and what her remark about a clock acquiring a history develops. D is the extra: it describes Pyke\'s manner but gives no idea for the clients to resist.' },
     { answer: 'H', explain: '"A history of its own" picks up "the history is the interesting part"; reproducing the worn teeth is the "mistake" in the next paragraph that has cost her commissions. E is tempting for the wheel, but it looks forward to the finished job.' },
-    { answer: 'B', explain: '"Repair" picks up "against repair" at the end of the previous paragraph; starting again and "ninety per cent patience" give "it" (what no manual can teach) in the next paragraph.' },
+    { answer: 'B', explain: '"Repair" picks up "against repair" at the end of the previous paragraph; starting again and "ninety per cent patience" lead into "That kind of patience" in the next paragraph.' },
     { answer: 'G', explain: '"However" contrasts with the retiring restorers, and "some of it" is the knowledge in the hands; the toothbrush job is the "test" that "he" (Daniel) describes in the next paragraph.' },
     { answer: 'A', explain: 'Persuading the paying clients leads to the electric movement suggestion, which "Her case" (practical, then sentimental) answers in the next paragraph.' },
     { answer: 'E', explain: 'It looks forward to the wheel returning to the tower and her listening for the tick, which "Anyone can hear a bell" answers; the final reference to "the next wheel" completes the circle.' }
@@ -114,27 +114,27 @@ Her case is partly practical, since electric movements fail whereas a well-kept 
 
 {1}
 
-The 1990s brought a change of fortune for the survivors. A handful of ecologists, searching for evidence of how living things were responding to a warming climate, realised that old diaries were precisely what they lacked. Instruments had measured temperature for generations, but the timing of natural events had been recorded almost nowhere on a consistent basis. Satellites could show how green a forest looked from space, but not on which morning a particular oak had opened its first leaf.
+The 1990s brought a change of fortune for the survivors. A handful of ecologists, searching for evidence of how living things were responding to a warming climate, realised that old diaries were precisely what they lacked. Instruments had measured temperature for generations, and weather stations had kept faithful accounts of rainfall and frost, but the timing of natural events had been recorded almost nowhere on a consistent basis. Satellites could show how green a forest looked from space, but not on which morning a particular oak had opened its first leaf.
 
 {2}
 
-By cross-checking entries from neighbouring parishes, researchers found that they could filter out the more eccentric observers, and what remained was a surprisingly coherent picture. It was not a tidy one, nor was it a flattering one, but it was the first that scientists could trust to the day.
+By cross-checking entries from neighbouring parishes, researchers found that they could filter out the more eccentric observers, and what remained was a surprisingly coherent picture. Some of the writers turned out to be reliable to within a day or two, year after year, which is a standard that few modern datasets can claim. It was not a tidy picture, but it was the first that scientists could trust.
 
 {3}
 
-What worries scientists more than the shift itself is its unevenness. Different species have moved at different speeds, and that is where the trouble begins, because most creatures depend on one another's timing.
+What worries scientists more than the shift itself is its unevenness. Nature is not a single clock but a vast arrangement of interlocking ones, each set over many thousands of years to run in step with the rest. If every part of that arrangement were to speed up together, little would be lost. Different species have moved at different speeds, however, and that is where the trouble begins, because most creatures depend on one another's timing.
 
 {4}
 
-Nobody watched the mismatch develop, which is why the old diaries matter. A single record tells us little, but thousands, spanning generations, allow scientists to ask when the gap between predator and prey first began to open, and whether it is still widening.
+Nobody watched the mismatch develop, which is why the old diaries matter. Nothing in a single season would have revealed it, for in any given year the gap is small and easily put down to the vagaries of the weather. A single record tells us little, but thousands, spanning generations, allow scientists to ask when the gap between predator and prey first began to open, and whether it is still widening.
 
 {5}
 
-There is, however, a catch. The volunteers tend to log whatever catches their eye, wherever they happen to be, and a record of the first butterfly in a sunny garden says little about the butterflies of a whole county. Statisticians can correct for some of this bias, but true continuity is difficult to replicate.
+There is, however, a catch. The volunteers tend to log whatever catches their eye, wherever they happen to be, and a record of the first butterfly in a sunny garden says little about the butterflies of a whole county. Some people look harder in April than in July, others give up after a wet week, and few stop to note what they did not see. Statisticians can correct for some of this bias, but true continuity is difficult to replicate.
 
 {6}
 
-It is a satisfying result, and a humbling one. A man with no instrument but a notebook and an attentive ear has proved more dependable than many of the devices that came after him. Thorne himself, one suspects, would have shrugged, and gone back to listening for the next bird.
+It is a satisfying result, and a humbling one. A man with no instrument but a notebook and an attentive ear has proved more dependable than many of the devices that came after him. There is a lesson in that for anyone who assumes that precision belongs only to machines, and that care, applied patiently enough, counts for rather more than equipment. Thorne himself, one suspects, would have shrugged, and gone back to listening for the next bird.
 
 {7}
 
